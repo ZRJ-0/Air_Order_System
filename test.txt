@@ -1,0 +1,79 @@
+{
+"dataset":{
+    "train": {"type": "mnist", "data_set": "train", "layout_x": "tensor"},
+    "test": {"type": "mnist", "data_set": "test", "layout_x": "tensor"}
+},
+"train":{
+    "keep_model_in_mem":0,
+    "random_state":0,
+    "data_cache":{
+        "cache_in_disk":{
+            "default":1
+        },
+        "keep_in_mem":{
+            "default":0
+        },
+        "cache_dir":"/mnt/raid/fengji/gcforest/mnist/fg-tree500-depth100-3folds/datas"
+    }
+},
+"net":{
+"outputs": ["pool1/7x7/ets", "pool1/7x7/rf", "pool1/10x10/ets", "pool1/10x10/rf", "pool1/13x13/ets", "pool1/13x13/rf"],
+"layers":[
+    {
+        "type":"FGWinLayer",
+        "name":"win1/7x7",
+        "bottoms": ["X","y"],
+        "tops":["win1/7x7/ets", "win1/7x7/rf"],
+        "n_classes": 124,
+        "estimators": [
+            {"n_folds":3,"type":"ExtraTreesClassifier","n_estimators":500,"max_depth":100,"n_jobs":-1,"min_samples_leaf":10},
+            {"n_folds":3,"type":"RandomForestClassifier","n_estimators":500,"max_depth":100,"n_jobs":-1,"min_samples_leaf":10}
+        ],
+        "stride_x": 2,
+        "stride_y": 2,
+        "win_x":7,
+        "win_y":7
+    },
+    {
+        "type":"FGWinLayer",
+        "name":"win1/10x10",
+        "bottoms": ["X","y"],
+        "tops":["win1/10x10/ets", "win1/10x10/rf"],
+        "n_classes": 10,
+        "estimators": [
+            {"n_folds":3,"type":"ExtraTreesClassifier","n_estimators":500,"max_depth":100,"n_jobs":-1,"min_samples_leaf":10},
+            {"n_folds":3,"type":"RandomForestClassifier","n_estimators":500,"max_depth":100,"n_jobs":-1,"min_samples_leaf":10}
+        ],
+        "stride_x": 2,
+        "stride_y": 2,
+        "win_x":10,
+        "win_y":10
+    },
+    {
+        "type":"FGWinLayer",
+        "name":"win1/13x13",
+        "bottoms": ["X","y"],
+        "tops":["win1/13x13/ets", "win1/13x13/rf"],
+        "n_classes": 10,
+        "estimators": [
+            {"n_folds":3,"type":"ExtraTreesClassifier","n_estimators":500,"max_depth":100,"n_jobs":-1,"min_samples_leaf":10},
+            {"n_folds":3,"type":"RandomForestClassifier","n_estimators":500,"max_depth":100,"n_jobs":-1,"min_samples_leaf":10}
+        ],
+        "stride_x": 2,
+        "stride_y": 2,
+        "win_x":13,
+        "win_y":13
+    },
+    {
+        "type":"FGPoolLayer",
+        "name":"pool1",
+        "bottoms": ["win1/7x7/ets", "win1/7x7/rf", "win1/10x10/ets", "win1/10x10/rf", "win1/13x13/ets", "win1/13x13/rf"],
+        "tops": ["pool1/7x7/ets", "pool1/7x7/rf", "pool1/10x10/ets", "pool1/10x10/rf", "pool1/13x13/ets", "pool1/13x13/rf"],
+        "pool_method": "avg",
+        "win_x":2,
+        "win_y":2
+    }
+]
+
+}
+}
